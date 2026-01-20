@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const furnitureSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    image: { type: [String] },
+    image: { type: [String], required: true },  // Fixed  
     price: { type: Number, required: true },
     tags: { type: [String], default: [] },  // Fixed
     category: { type: String, required: true },

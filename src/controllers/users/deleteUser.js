@@ -2,7 +2,7 @@ import User from "../../models/users.js";
 import httpStatus, { status } from  "http-status";
 
 //controller to delete a user by ID 
-export const deletUser = async  (req, res) => {
+export const deleteUser = async  (req, res) => {
     try {
         //Extract user ID from request parameters
         const { id } = req.params; 

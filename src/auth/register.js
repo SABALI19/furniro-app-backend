@@ -33,7 +33,7 @@ export const registerUser = async (req, res) => {
 
 
         //step create a new user instance
-        const newUser = new User({name, email, hashedPassword, role});
+        const newUser = new User({name, email, password: hashedPassword, role});
         await newUser.save();
 
         //step4: send a success response
