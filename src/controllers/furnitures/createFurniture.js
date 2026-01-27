@@ -1,19 +1,9 @@
 import Furniture from "../../models/furniture.js";
-import httpStatus, { status } from "http-status";
-import { createFurnitureSchema } from "../../validators/createFurniture.js";
+import httpStatus from "http-status";
 
+// function to create a new furniture item
 export const createFurniture = async (req, res) => {
   try {
-
-    //Validate the request body(create furniture)
-        const { error } = createFurnitureSchema.validate(req.body);
-        if (error) {
-          return res.status(httpStatus.BAD_REQUEST).json({
-            status: "validation Error", 
-            message: error.details[0].message,
-          })
-        }
-    // destructure furniture details from request body
     const {
       name,
       price,
@@ -22,48 +12,53 @@ export const createFurniture = async (req, res) => {
       description,
       size,
       color,
-      instock,
+      inStock,
       quantity,
       discount,
-      image // Added image field
-    } = req.body;
+    } = req.body || {};
 
-    // check if furniture with the same name exists - FIXED: findOne
-    const existingFurniture = await Furniture.findOne({ name });
-
-    if (existingFurniture) {
-      return res.status(httpStatus.CONFLICT).json({
+    if (!name || !price) {
+      return res.status(400).json({
         status: "Error",
-        message: "Furniture with the same name already exists"
+        message: "Name and price are required",
       });
     }
 
-    // Create a new furniture item
+    const images = req.files ? req.files.map((file) => file.filename) : [];
+
+    const existingFurniture = await Furniture.findOne({ name });
+    if (existingFurniture) {
+      return res.status(409).json({
+        status: "Error",
+        message: "Furniture with the same name already exists",
+      });
+    }
+
     const newFurniture = await Furniture.create({
       name,
+      images,
       price,
       tags,
       category,
       description,
       size,
       color,
-      instock,
+      inStock,
       quantity,
       discount,
-      image // Added image field
     });
 
-    // send response back to client
     return res.status(httpStatus.CREATED).json({
-      status: "success",
+      status: "Success",
       message: "Furniture created successfully",
       data: newFurniture,
     });
   } catch (error) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       status: "Error",
-      message: "Internal server Error",
+      message: "Internal Server Error",
       error: error.message,
     });
   }
 };
+

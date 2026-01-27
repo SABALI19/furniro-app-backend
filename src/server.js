@@ -1,52 +1,53 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./dbConnections/dbConnection.js";
-import furnitureRoutes from './routes/furniture.js'
-import userRoutes  from "./routes/user.js";
-
-
-// configure dotenv FIRST
-dotenv.config();
-
+import furnitureRoutes from "./routes/furniture.js";
+import userRoutes from "./routes/user.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 // create an instance of express application
 const app = express();
 
-//middleware to parse json data
+// middleware to parse json data
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// configure dotenv
+dotenv.config();
+
+// call server to listen to PORT
+const PORT = process.env.PORT;
 
 // create simple route/endpoint
 app.get("/", (req, res) => {
   res.send("Welcome to Furniro Server");
 });
 
-app.get("/about", (req, res) => {
-  res.send("Welcome to About us page");
-});
+//configure server to serve static files
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-//define furniture route 
+//configure uploads via env variable(for the use of Render disk mount path feature when in production)
+const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, "uploads");
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+app.use("/uploads", express.static(UPLOADS_DIR));
+
+//define routes
 app.use("/api/furniture", furnitureRoutes);
 app.use("/api/user", userRoutes);
-//define user route
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    status: "error",
-    message: "Something went wrong!",
-  });
-});
-
-const PORT = process.env.PORT || 5000;
 
 const startSever = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
       console.log(`Server is listening to PORT ${PORT}`);
     });
   } catch (e) {
-    console.log(`Server could not connect due to database error: ${e.message}`);
+    console.log(`Sever could not connect due to database error: ${e.message}`);
   }
 };
 
