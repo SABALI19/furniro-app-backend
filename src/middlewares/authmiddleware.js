@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
 import httpStatus from "http-status";
 import dotenv from "dotenv";
+import User from "../models/users.js";
 dotenv.config();
 
 
-export const authenticateUser = (req, res, next) =>{
+export const authenticateUser = async (req, res, next) => {
     //get authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -19,7 +20,12 @@ export const authenticateUser = (req, res, next) =>{
     const token = authHeader.split(" ")[1];
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
+
+        const user = await User.findById(decoded.id).select("-password");
+        if (!user) {
+            return res.status(401).json({ message: "User not found" });
+        }
+        req.user = user;
         next();
     }catch (error) {
         console.error("JWT Error:", error.message);
@@ -37,7 +43,7 @@ export const authenticateUser = (req, res, next) =>{
 const checkRole = (...allowedRoles) => {
     return (req, res, next) => {
         if(!allowedRoles.includes(req.user.role)) {
-            return res.status(http.Status.FORBIDDEN).json({
+            return res.status(httpStatus.FORBIDDEN).json({
                 status: "forbidden",
                 message: "Forbidden: Access denied!",
             });

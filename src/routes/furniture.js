@@ -21,7 +21,6 @@ router.get("/all-furniture", fetchAllFurniture);      // GET /api/furniture
 router.get("/furniture-details/:id", getSingleFurniture); // GET /api/furniture/furniture-details/:id
 router.put("/update-furniture/:id", authenticateUser, checkRole("admin"), updateFurniture);
 router.delete("/delete-furniture/:id", authenticateUser, checkRole("admin"), deleteFurniture); // DELETE /api/furniture/delete-furniture/:id
-router.get("/furniture-details/:id", getSingleFurniture); // GET /api/furniture/furniture-details/:id
 
 
 //export the router
