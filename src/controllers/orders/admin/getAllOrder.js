@@ -8,7 +8,7 @@ export const getAllOrders = async (req, res) => {
 
         res.status(httpStatus.OK).json({
             status: "Success",
-            message: "Orders retrieved successfully",
+            message: "Orders retrieved successfully",  
             data: orders,
         })
     } catch (error) {
