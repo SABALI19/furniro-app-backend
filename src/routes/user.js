@@ -5,14 +5,14 @@ import { getUserById } from "../controllers/users/getUserById.js";
 import { deleteUser } from "../controllers/users/deleteUser.js";
 import { loginUser} from "../auth/login.js";
 import { authenticateUser, checkRole } from "../middlewares/authmiddleware.js";
-
+import {apiLimiter} from "../middlewares/rateLimiter.js";
 
 // create an instance of express router
 const router = express.Router();
 
 //define user routes/endpoints
-router.post("/register", registerUser);
-router.post("/login", loginUser);
+router.post("/register", apiLimiter, registerUser);
+router.post("/login", apiLimiter, loginUser);
 router.get("/users", authenticateUser, checkRole("admin"), getAllUsers);
 router.get("/user-details/:id", authenticateUser, checkRole("admin", "customer"), getUserById);
 router.delete("/delete-user/:id", authenticateUser, checkRole("admin"), deleteUser);

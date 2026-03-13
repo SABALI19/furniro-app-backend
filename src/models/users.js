@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
         password: { type: String, required: true, min: 6, max: 16},
         role: { type: String, enum: ["admin", "customer"] , default: "customer" },
     },
+    
     {timestamps: true}
 
 );

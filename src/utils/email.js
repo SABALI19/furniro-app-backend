@@ -1,25 +1,7 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-export const createTransporter = () => {
-    const user = process.env.GMAIL_USER;
-    const pass = process.env.GMAIL_PASS;
+const resend = new Resend("re_CrJC1z2F_HSe3v64o7N5hUtPsHZ2iQa8g"); 
 
-    if (!user || !pass) {
-        throw new Error("Missing email credentials. Set GMAIL_USER/GMAIL_PASS or EMAIL_USER/EMAIL_PASS in .env.");
-    }
-
-    return nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-            user,
-            pass,
-        },
-        logger: true,
-        debug: true,
-    });
-};
 
 export const sendOtpEmail = async (toEmail, otp) => {
     const transporter = createTransporter();
